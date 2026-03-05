@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: feelingcare-db
+    environment:
+      POSTGRES_USER: feelingcare
+      POSTGRES_PASSWORD: feelingcare
+      POSTGRES_DB: feelingcare
+    ports:
+      - "5432:5432"
+    volumes:
+      - feelingcare_pgdata:/var/lib/postgresql/data
+
+volumes:
+  feelingcare_pgdata:
