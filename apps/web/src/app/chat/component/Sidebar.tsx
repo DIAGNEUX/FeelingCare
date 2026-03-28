@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { listConversations } from "@/lib/api";
 import NewConversationButton from "./NewConversationButton";
+import DeleteConversationButton from "./DeleteConversationButton";
+import type { Emotion } from "@/lib/types";
 
-function formatEmotion(emotion: string | null) {
-  return emotion ? emotion : "—";
+function formatEmotion(emotion: Emotion | null) {
+  return emotion ? emotion.name : "—";
 }
 
 export default async function Sidebar({ activeId }: { activeId: string }) {
@@ -15,7 +17,7 @@ export default async function Sidebar({ activeId }: { activeId: string }) {
       <div className="p-4 space-y-3">
         <div>
           <div className="text-sm font-semibold text-white/90">FeelingCare</div>
-          <p className="text-xs text-white/60">Espace d’écoute bienveillant</p>
+          <p className="text-xs text-white/60">Espace d'écoute bienveillant</p>
         </div>
 
         <div className="space-y-2">
@@ -25,7 +27,6 @@ export default async function Sidebar({ activeId }: { activeId: string }) {
           >
             Choisir une émotion
           </Link>
-
           <NewConversationButton />
         </div>
 
@@ -37,18 +38,31 @@ export default async function Sidebar({ activeId }: { activeId: string }) {
         {conversations.map((c) => {
           const active = c.id === activeId;
           return (
-            <Link
+            <div
               key={c.id}
-              href={`/chat/${c.id}`}
-              className={`block rounded-xl px-3 py-2 text-sm border ${
+              className={`group relative flex items-center rounded-xl border ${
                 active
                   ? "border-white/20 bg-white/5"
                   : "border-white/10 hover:bg-white/5"
               }`}
             >
-              <div className="truncate">{c.title}</div>
-              <div className="text-xs text-white/50">{formatEmotion(c.emotion)}</div>
-            </Link>
+              {/* Lien vers la conversation */}
+              <Link
+                href={`/chat/${c.id}`}
+                className="flex-1 px-3 py-2 text-sm min-w-0"
+              >
+                <div className="truncate">{c.title}</div>
+                <div className="text-xs text-white/50">{formatEmotion(c.emotion)}</div>
+              </Link>
+
+              {/* Bouton supprimer — visible au hover */}
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity pr-2 shrink-0">
+                <DeleteConversationButton
+                  conversationId={c.id}
+                  isActive={active}
+                />
+              </div>
+            </div>
           );
         })}
       </nav>

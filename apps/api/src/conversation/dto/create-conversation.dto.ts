@@ -4,7 +4,7 @@ export class CreateConversationDto {
   @IsOptional()
   @IsString()
   @MaxLength(32)
-  emotion?: string;
+  emotionId?: string;
 }
 export class CreateMessageDto {
   @IsString()

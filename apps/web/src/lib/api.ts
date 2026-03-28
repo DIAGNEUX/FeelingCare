@@ -1,4 +1,4 @@
-import type { Conversation, Message, ConversationListItem, ConversationStartResponse } from "./types";
+import type { Conversation, Message, ConversationListItem, ConversationStartResponse, Emotion } from "./types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -21,12 +21,20 @@ async function parseJson<T>(res: Response): Promise<T> {
   return JSON.parse(text) as T;
 }
 
+export async function getEmotions(): Promise<Emotion[]> {
+  const res = await fetch(`${API_URL}/emotions`, {
+    method: "GET",
+    cache: "no-store",
+  });
 
-export async function createConversation(emotion?: string): Promise<ConversationStartResponse> {
+  return parseJson<Emotion[]>(res);
+}
+
+export async function createConversation(emotionId?: string): Promise<ConversationStartResponse> {
   const res = await fetch(`${API_URL}/conversations`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(emotion ? { emotion } : {}),
+    body: JSON.stringify(emotionId ? { emotionId } : {}),
   });
 
   return parseJson<ConversationStartResponse>(res);
@@ -60,4 +68,30 @@ export async function listConversations(): Promise<ConversationListItem[]> {
   return parseJson<ConversationListItem[]>(res);
 }
 
+export async function deleteConversation(id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/conversations/${id}`, {
+    method: "DELETE",
+  });
 
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API error ${res.status}: ${text}`);
+  }
+}
+
+export async function editMessage(
+  conversationId: string,
+  messageId: string,
+  content: string
+): Promise<void> {
+  const res = await fetch(`${API_URL}/conversations/${conversationId}/messages/${messageId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API error ${res.status}: ${text}`);
+  }
+}

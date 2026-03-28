@@ -12,11 +12,19 @@ enum MessageRole {
   ASSISTANT
 }
 
+model Emotion {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  conversations Conversation[]
+}
+
 model Conversation {
   id        String    @id @default(cuid())
   title     String
-  emotion   String?
   createdAt DateTime  @default(now())
+
+  emotion   Emotion?  @relation(fields: [emotionId], references: [id])
+  emotionId String?
 
   messages  Message[]
 }

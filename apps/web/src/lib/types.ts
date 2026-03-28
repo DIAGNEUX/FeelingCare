@@ -8,17 +8,23 @@ export type Message = {
   conversationId: string;
 };
 
+export type Emotion = {
+  id: string;
+  name: string;
+};
+
 export type Conversation = {
   id: string;
   title: string;
-  emotion: string | null;
+  emotion: Emotion | null;
   createdAt: string;
   messages: Message[];
 };
+
 export type ConversationListItem = {
   id: string;
   title: string;
-  emotion: string | null;
+  emotion: Emotion | null;
   createdAt: string;
   lastMessageAt: string;
 };
