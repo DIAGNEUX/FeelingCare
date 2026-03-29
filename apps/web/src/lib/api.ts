@@ -95,3 +95,61 @@ export async function editMessage(
     throw new Error(`API error ${res.status}: ${text}`);
   }
 }
+
+export async function renameConversation(id: string, title: string): Promise<void> {
+  const res = await fetch(`${API_URL}/conversations/${id}/title`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API error ${res.status}: ${text}`);
+  }
+}
+
+export async function streamMessage(
+  conversationId: string,
+  content: string,
+  onChunk: (chunk: string) => void,
+  onDone: () => void,
+) {
+  const res = await fetch(
+    `${API_URL}/conversations/${conversationId}/messages/stream`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    }
+  );
+
+  if (!res.body) throw new Error("No stream");
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+
+    const parts = buffer.split("\n\n");
+
+    for (let i = 0; i < parts.length - 1; i++) {
+      const line = parts[i];
+
+      if (line.startsWith("data: ")) {
+        const json = JSON.parse(line.replace("data: ", ""));
+
+        if (json.chunk) onChunk(json.chunk);
+        if (json.done) onDone();
+      }
+    }
+
+    buffer = parts[parts.length - 1];
+  }
+}

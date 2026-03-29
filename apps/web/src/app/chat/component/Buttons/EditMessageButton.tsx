@@ -83,7 +83,7 @@ export default function EditMessageButton({
 
     return (
     <div className="group/msg flex flex-col items-end gap-1 max-w-[70%]">
-        <div className="w-fit rounded-2xl px-4 py-3 text-sm bg-blue-500 text-white">
+        <div className="w-fit rounded-2xl px-4 py-3 text-sm bg-white/10 text-white">
         <div className="whitespace-pre-wrap break-words">{initialContent}</div>
         </div>
         <button

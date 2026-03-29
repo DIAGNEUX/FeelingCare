@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { Message } from "@/lib/types";
 import TypingMessage from "./TypingMessage";
-import EditMessageButton from "./EditMessageButton";
+import EditMessageButton from "./Buttons/EditMessageButton";
 
 function formatTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString("fr-FR", {
@@ -50,16 +50,12 @@ export default function MessageList({
                 initialContent={m.content}
               />
             ) : (
-              <div className="max-w-[70%] rounded-2xl px-4 py-3 text-sm bg-white/10 text-white">
-                {isLastAssistant ? (
-                  <TypingMessage content={m.content} />
-                ) : (
+              <div className="max-w-[70%] rounded-2xl  py-2 text-sm  text-white">       
                   <div className="whitespace-pre-wrap">{m.content}</div>
-                )}
               </div>
             )}
             {/* Timestamp visible au hover uniquement */}
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-white/25 mt-1 px-1">
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-white/25 ">
               {formatTime(m.createdAt)}
             </span>
           </div>

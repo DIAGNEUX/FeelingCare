@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { listConversations } from "@/lib/api";
-import NewConversationButton from "./NewConversationButton";
-import DeleteConversationButton from "./DeleteConversationButton";
+import NewConversationButton from "./Buttons/NewConversationButton";
+import DeleteConversationButton from "./Buttons/DeleteConversationButton";
+import RenameConversationButton from "./Buttons/RenameConversationButton";
 import type { Emotion } from "@/lib/types";
 
 function formatEmotion(emotion: Emotion | null) {
@@ -46,15 +47,21 @@ export default async function Sidebar({ activeId }: { activeId: string }) {
                   : "border-white/10 hover:bg-white/5"
               }`}
             >
-              {/* Lien vers la conversation */}
-              <Link
-                href={`/chat/${c.id}`}
-                className="flex-1 px-3 py-2 text-sm min-w-0"
-              >
-                <div className="truncate">{c.title}</div>
-                <div className="text-xs text-white/50">{formatEmotion(c.emotion)}</div>
-              </Link>
 
+            {/* Lien vers la conversation + renommer */}
+              <div className="flex-1 min-w-0 flex flex-col gap-0.5 p-2">
+                <div className="flex items-center gap-1 min-w-0">
+                  <Link
+                    href={`/chat/${c.id}`}
+                    className="shrink-0"
+                  />
+                  <RenameConversationButton
+                    conversationId={c.id}
+                    currentTitle={c.title}
+                  />
+                </div>
+                <div className="text-xs text-white/50 px-1">{formatEmotion(c.emotion)}</div>
+              </div>
               {/* Bouton supprimer — visible au hover */}
               <div className="opacity-0 group-hover:opacity-100 transition-opacity pr-2 shrink-0">
                 <DeleteConversationButton
