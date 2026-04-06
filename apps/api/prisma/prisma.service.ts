@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
-    // appelé automatiquement quand Nest démarre le module
+    // connect to the database
     await this.$connect();
   }
 }

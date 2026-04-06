@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ConversationRepository } from '../infrastructure/conversation.repository';
-import { Conversation } from '../domain/conversation.entity';
+import { ConversationRepository } from '../../infrastructure/conversation.repository';
+import { Conversation } from '../../domain/conversation.entity';
 
 @Injectable()
 export class CreateConversationUseCase {

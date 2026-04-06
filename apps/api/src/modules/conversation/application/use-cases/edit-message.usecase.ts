@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConversationRepository } from '../infrastructure/conversation.repository';
-import { Conversation } from '../domain/conversation.entity';
-import { GenerateReplyUseCase } from '../../ai/application/generate-reply.usecase';
+import { ConversationRepository } from '../../infrastructure/conversation.repository';
+import { Conversation } from '../../domain/conversation.entity';
+import { GenerateReplyUseCase } from 'src/modules/ai/application/use-cases/generate-reply.usecase';
 
 @Injectable()
 export class EditMessageUseCase {

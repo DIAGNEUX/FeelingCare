@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConversationRepository } from '../infrastructure/conversation.repository';
-import { Conversation } from '../domain/conversation.entity';
-import { GenerateReplyStreamUseCase } from '../../ai/application/generate-reply-stream.usecase';
-import { GenerateTitleUseCase } from '../../ai/application/generate-title.usecase';
+import { ConversationRepository } from '../../infrastructure/conversation.repository';
+import { Conversation } from '../../domain/conversation.entity';
+import { GenerateReplyStreamUseCase } from 'src/modules/ai/application/use-cases/generate-reply-stream.usecase';
+import { GenerateTitleUseCase } from 'src/modules/ai/application/use-cases/generate-title.usecase';
 @Injectable()
 export class StreamMessageUseCase {
   constructor(

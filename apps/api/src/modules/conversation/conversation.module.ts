@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { ConversationController } from './controller/conversation.controller';
 import { ConversationRepository } from './infrastructure/conversation.repository';
-import { CreateConversationUseCase } from './use-cases/create-conversation.usecase';
-import { AddUserMessageUseCase } from './use-cases/add-user-message.usecase';
-import { StreamMessageUseCase } from './use-cases/stream-message.usecase';
-import { EditMessageUseCase } from './use-cases/edit-message.usecase';
+import { CreateConversationUseCase } from './application/use-cases/create-conversation.usecase';
+import { AddUserMessageUseCase } from './application/use-cases/add-user-message.usecase';
+import { StreamMessageUseCase } from './application/use-cases/stream-message.usecase';
+import { EditMessageUseCase } from './application/use-cases/edit-message.usecase';
 import { PrismaModule } from 'prisma/prisma.module';
 import { AiModule } from '../ai/ai.module';
 

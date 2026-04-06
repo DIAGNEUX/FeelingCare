@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { CreateConversationDto, CreateMessageDto } from './dto/create-conversation.dto';
-import { CreateConversationUseCase } from './use-cases/create-conversation.usecase';
-import { AddUserMessageUseCase } from './use-cases/add-user-message.usecase';
-import { StreamMessageUseCase } from './use-cases/stream-message.usecase';
-import { EditMessageUseCase } from './use-cases/edit-message.usecase';
+import { CreateConversationUseCase } from './application/use-cases/create-conversation.usecase';
+import { AddUserMessageUseCase } from './application/use-cases/add-user-message.usecase';
+import { StreamMessageUseCase } from './application/use-cases/stream-message.usecase';
+import { EditMessageUseCase } from './application/use-cases/edit-message.usecase';
 import { ConversationRepository } from './infrastructure/conversation.repository';
 
 @Injectable()
