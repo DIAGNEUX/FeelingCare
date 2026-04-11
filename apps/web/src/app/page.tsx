@@ -1,6 +1,6 @@
 "use client";
 
-import Accueil from "./accueil/page";
+import Accueil from "./home/page";
 export default function Home() {
   
 

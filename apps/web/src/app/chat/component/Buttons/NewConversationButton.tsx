@@ -24,7 +24,7 @@ export default function NewConversationButton() {
 
   return (
     <button
-      className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm hover:bg-white/5 text-left"
+      className="w-full rounded-md border border-white/10 px-3 py-2 text-sm hover:bg-white/5 text-left"
       onClick={onClick}
       disabled={loading}
       type="button"

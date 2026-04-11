@@ -1,54 +1,74 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { renameConversation } from "@/lib/api";
 
 export default function RenameConversationButton({
   conversationId,
   currentTitle,
+  forceEditing,
+  onDone,
+  onRenameSuccess,
 }: {
   conversationId: string;
   currentTitle: string;
+  forceEditing?: boolean;
+  onDone?: () => void;
+  onRenameSuccess?: (title: string) => void;
 }) {
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(forceEditing || false);
   const [title, setTitle] = useState(currentTitle);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  async function onSave() {
-    const text = title.trim();
-    if (!text || text === currentTitle) {
-      setEditing(false);
-      return;
+  useEffect(() => {
+    if (forceEditing) {
+      setEditing(true);
+      setTitle(currentTitle);
     }
+  }, [forceEditing, currentTitle]);
 
-    try {
-      setLoading(true);
-      await renameConversation(conversationId, text);
-      setEditing(false);
-      router.refresh();
-    } catch (err) {
-      console.error(err);
-      alert("Impossible de renommer la conversation.");
-    } finally {
-      setLoading(false);
-    }
+  async function onSave() {
+  const text = title.trim();
+
+  if (!text || text === currentTitle) {
+    setEditing(false);
+    onDone?.();
+    return;
   }
+
+  try {
+    setLoading(true);
+    await renameConversation(conversationId, text);
+
+    onRenameSuccess?.(text);
+
+    setEditing(false);
+    onDone?.();
+  } catch (err) {
+    console.error(err);
+    alert("Impossible de renommer la conversation.");
+  } finally {
+    setLoading(false);
+  }
+}
 
   if (editing) {
     return (
       <input
-        className="flex-1 bg-transparent  text-sm text-white focus:outline-none focus:border-white/50 px-1 py-0.5 min-w-0"
+        className="flex-1 bg-transparent text-sm text-white focus:outline-none border border-white/20 rounded px-1 py-0.5 min-w-0"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         disabled={loading}
         autoFocus
+        onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => {
           if (e.key === "Enter") onSave();
           if (e.key === "Escape") {
             setTitle(currentTitle);
             setEditing(false);
+            onDone?.();
           }
         }}
         onBlur={onSave}
@@ -57,12 +77,8 @@ export default function RenameConversationButton({
   }
 
   return (
-    <button
-      onClick={() => setEditing(true)}
-      className="truncate text-left flex-1 min-w-0 hover:text-white/80 transition-colors text-sm"
-      title="Cliquer pour renommer"
-    >
+    <div className="truncate text-sm text-white/80 px-1">
       {currentTitle}
-    </button>
+    </div>
   );
 }
