@@ -22,6 +22,8 @@ async function bootstrap() {
       ?.split(',')
       .map((origin) => origin.trim())
       .filter(Boolean) ?? ['http://localhost:3000'];
+  console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
+  console.log('allowedOrigins:', allowedOrigins);
 
   app.enableCors({
     origin: allowedOrigins,
