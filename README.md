@@ -26,6 +26,15 @@ L'application propose deux niveaux d'expérience.
 En mode invité, l'utilisateur peut choisir une humeur ou commencer directement une conversation. Rien n'est enregistré, ce qui permet de tester l'expérience sans friction.
 
 En mode connecté, l'utilisateur retrouve ses conversations, son dashboard émotionnel et son profil. Les conversations ne sont créées en base qu'après le premier message utilisateur, afin d'éviter d'enregistrer des échanges vides.
+## Aperçu Visuel
+### Accueil
+<img width="763" height="383" alt="image" src="https://github.com/user-attachments/assets/3b8a816d-3f9d-4fdf-8292-e712c14a6059" />
+
+### Conversation
+<img width="959" height="411" alt="image" src="https://github.com/user-attachments/assets/3a2df96c-d1c1-4dd2-a250-d43ed7500030" />
+
+### Dashboard
+<img width="959" height="410" alt="image" src="https://github.com/user-attachments/assets/ae5953d4-dc71-46a2-864f-8746aa981220" />
 
 ## Fonctionnalités
 
