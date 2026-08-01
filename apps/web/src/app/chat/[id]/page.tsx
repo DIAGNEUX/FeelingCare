@@ -1,36 +1,78 @@
-import { getConversation } from "@/lib/api";
-import MessageComposer from "../component/MessageComposer";
-import MessageList from "../component/MessageList";
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { HeartPulse } from "lucide-react";
+
+import { getConversation } from "@/lib/api/conversation.api";
+import RequireAuth from "@/app/component/auth/RequireAuth";
 import Sidebar from "../component/Sidebar";
+import ChatClient from "../ChatClient";
+import type { Conversation } from "@/lib/types";
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
+function SavedChatContent({ params }: { params: Promise<{ id: string }> }) {
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [id, setId] = useState<string | null>(null);
+  const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
 
-export default async function ChatPage({ params }: PageProps) {
-  const { id } = await params;
-  const conversation = await getConversation(id);
+  const loadConversation = useCallback(async (conversationId: string) => {
+    const data = await getConversation(conversationId);
+    setConversation(data);
+    return data;
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function init() {
+      const resolvedParams = await params;
+      if (cancelled) return;
+
+      setId(resolvedParams.id);
+
+      await loadConversation(resolvedParams.id);
+    }
+
+    init();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loadConversation, params]);
+
+  const refreshConversation = useCallback(async () => {
+    if (!id) return;
+
+    await loadConversation(id);
+    setSidebarRefreshKey((current) => current + 1);
+  }, [id, loadConversation]);
+
+  if (!conversation || !id) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-feelingcare-light-bg text-feelingcare-light-text dark:bg-feelingcare-dark-bg dark:text-feelingcare-dark-text">
+        <div className="flex items-center gap-3 rounded-full border border-feelingcare-light-border bg-white px-5 py-3 text-sm font-bold shadow-sm dark:border-feelingcare-dark-border dark:bg-feelingcare-dark-bg-secondary">
+          <HeartPulse className="h-4 w-4 animate-pulse text-feelingcare-primary" />
+          Chargement...
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex bg-[radial-gradient(circle_at_center,_#101519_12%,_#101316_36%,_#0F1115_96%)]">
-      <Sidebar activeId={id} />
-      <main className="flex-1 flex flex-col p-6 max-w-2xl mx-auto h-screen">
-        <header className="mb-6 shrink-0 text-amber-50">
-          <h1 className="text-xl font-semibold">{conversation.title}</h1>
-          <p className="text-sm opacity-60">
-            {conversation.emotion ? `Émotion: ${conversation.emotion.name}` : "Sans émotion"}
-          </p>
-        </header>
-
-        {/* MessageList gère le scroll */}
-        <MessageList messages={conversation.messages} conversationId={conversation.id} />
-
-
-        {/* Input fixé en bas */}
-        <div className="shrink-0">
-          <MessageComposer conversationId={conversation.id} />
-        </div>
-      </main>
+    <div className="flex min-h-screen bg-feelingcare-light-bg text-feelingcare-light-text transition-colors duration-300 dark:bg-feelingcare-dark-bg dark:text-feelingcare-dark-text">
+      <Sidebar activeId={id} refreshKey={sidebarRefreshKey} />
+      <ChatClient
+        key={conversation.id}
+        conversation={conversation}
+        onConversationRefresh={refreshConversation}
+      />
     </div>
+  );
+}
+
+export default function ChatPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <RequireAuth>
+      <SavedChatContent params={params} />
+    </RequireAuth>
   );
 }

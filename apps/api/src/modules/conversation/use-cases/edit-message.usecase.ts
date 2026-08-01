@@ -6,11 +6,12 @@ import { GenerateReplyUseCase } from '../../ai/application/generate-reply.usecas
 @Injectable()
 export class EditMessageUseCase {
   constructor(
-  private readonly repo: ConversationRepository,
-  private readonly generateReply: GenerateReplyUseCase,
-) {}
+    private readonly repo: ConversationRepository,
+    private readonly generateReply: GenerateReplyUseCase,
+  ) {}
 
   async execute(
+    userId: string,
     conversationId: string,
     messageId: string,
     content: string,
@@ -62,7 +63,7 @@ export class EditMessageUseCase {
 
   private formatHistory(history: any[]) {
     return history.map((m) => ({
-      role: m.role === 'USER' ? 'user' as const : 'assistant' as const,
+      role: m.role === 'USER' ? ('user' as const) : ('assistant' as const),
       content: m.content,
     }));
   }

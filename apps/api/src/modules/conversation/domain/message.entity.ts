@@ -6,7 +6,7 @@ import { Conversation } from '../domain/conversation.entity';
 export class CreateConversationUseCase {
   constructor(private readonly repo: ConversationRepository) {}
 
-  async execute(emotionId?: string) {
+  async execute(userId: string, emotionId?: string) {
     // 1. Récupérer le nom de l'émotion (infra)
     let emotionName: string | null = null;
 
@@ -23,6 +23,7 @@ export class CreateConversationUseCase {
 
     // 4. Sauvegarder en base (infra)
     return this.repo.createConversationWithFirstMessage(
+      userId,
       emotionId,
       openingMessage,
     );

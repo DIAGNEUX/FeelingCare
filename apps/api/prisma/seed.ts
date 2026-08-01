@@ -11,6 +11,7 @@ async function main() {
     { name: 'En colère' },
   ];
 
+  // Seed emotions
   for (const emotion of emotions) {
     await prisma.emotion.upsert({
       where: { name: emotion.name },
@@ -19,7 +20,17 @@ async function main() {
     });
   }
 
-  console.log('✅ Emotions seedées avec succès !');
+  // 🔥 Seed user (ICI)
+  await prisma.user.upsert({
+    where: { email: "test@test.com" },
+    update: {},
+    create: {
+      id: "dev-user-1",
+      email: "test@test.com",
+    },
+  });
+
+  console.log('✅ Emotions + User seedés avec succès !');
 }
 
 main()

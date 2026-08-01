@@ -14,21 +14,21 @@ export default function AuthCard({
   footer,
 }: AuthCardProps) {
   return (
-    <div
-      className="
-        w-full max-w-md p-8 rounded-2xl
-        bg-[#0F1115]/90 backdrop-blur-md
-        shadow-2xl 
-      "
-    >
-      <h1 className="text-white text-lg font-semibold mb-1">
+    <div className="w-full max-w-md rounded-[2rem] border border-feelingcare-light-border bg-white p-8 shadow-[0_24px_70px_rgba(23,23,23,0.10)] dark:border-feelingcare-dark-border dark:bg-feelingcare-dark-bg-secondary dark:shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
+      <div className="mb-8 inline-flex rounded-full bg-feelingcare-primary px-4 py-2 text-xs font-bold uppercase text-feelingcare-light-text">
+        FeelingCare
+      </div>
+
+      <h1 className="text-3xl font-bold text-feelingcare-light-text dark:text-feelingcare-dark-text">
         {title}
       </h1>
-      <p className="text-gray-400 text-sm mb-6">{subtitle}</p>
+      <p className="mt-2 text-sm font-medium leading-6 text-feelingcare-light-text-secondary dark:text-feelingcare-dark-text-secondary">
+        {subtitle}
+      </p>
 
-      <div className="space-y-4">{children}</div>
+      <div className="mt-8 space-y-4">{children}</div>
 
-      <div className="mt-6 text-center text-sm text-gray-400">
+      <div className="mt-7 text-center text-sm text-feelingcare-light-text-secondary dark:text-feelingcare-dark-text-secondary">
         {footer}
       </div>
     </div>

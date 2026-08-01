@@ -31,7 +31,16 @@ export default function MessageList({
     .at(-1);
 
   return (
-    <section className="flex-1 overflow-y-auto space-y-4 py-4">
+    <section className="flex-1 space-y-8 overflow-y-auto px-1 py-6 sm:px-5">
+      {messages.length === 0 && (
+        <div className="mx-auto mt-20 max-w-sm text-center text-feelingcare-light-text dark:text-feelingcare-dark-text">
+          <p className="text-lg font-bold">Tu peux commencer ici.</p>
+          <p className="mt-2 text-sm leading-6 text-feelingcare-light-text-secondary dark:text-feelingcare-dark-text-secondary">
+            Pose ce qui est present, meme si ce n&apos;est pas encore clair.
+          </p>
+        </div>
+      )}
+
       {messages.map((m, index) => {
         const isUser = m.role === "USER";
         const isLastAssistant = index === lastAssistantIndex;
@@ -50,12 +59,15 @@ export default function MessageList({
                 initialContent={m.content}
               />
             ) : (
-              <div className="max-w-[70%] rounded-2xl  py-2 text-sm  text-white">       
-                  <div className="whitespace-pre-wrap">{m.content}</div>
+              <div className="max-w-[82%] px-1 py-1 text-[15px] leading-7 text-feelingcare-light-text dark:text-feelingcare-dark-text sm:max-w-[72%]">
+                {isLastAssistant ? (
+                  <TypingMessage content={m.content} />
+                ) : (
+                  <div className="whitespace-pre-wrap ">{m.content}</div>
+                )}
               </div>
             )}
-            {/* Timestamp visible au hover uniquement */}
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-white/25 ">
+            <span className="mt-1 px-2 text-xs text-feelingcare-light-text-secondary opacity-0 transition-opacity group-hover:opacity-100 dark:text-feelingcare-dark-text-secondary/60">
               {formatTime(m.createdAt)}
             </span>
           </div>

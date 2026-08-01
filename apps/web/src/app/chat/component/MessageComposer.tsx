@@ -1,56 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { sendMessage } from "@/lib/api";
-import { streamMessage } from "@/lib/api";
+import { Loader2, SendHorizontal } from "lucide-react";
+
+import { streamMessage } from "@/lib/api/message.api";
 
 function TypingIndicator() {
   return (
     <div className="flex justify-start">
-      <div className="max-w-[70%] rounded-2xl px-3 py-2 bg-white/10">
+      <div className="rounded-2xl bg-feelingcare-primary/15 px-4 py-3 dark:bg-feelingcare-primary-dark/10">
         <div className="flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-bounce [animation-delay:0ms]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-bounce [animation-delay:150ms]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-bounce [animation-delay:300ms]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-feelingcare-primary animate-bounce [animation-delay:0ms]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-feelingcare-primary animate-bounce [animation-delay:150ms]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-feelingcare-primary animate-bounce [animation-delay:300ms]" />
         </div>
       </div>
     </div>
   );
 }
 
-export default function MessageComposer({ conversationId }: { conversationId: string }) {
+type Props = {
+  conversationId: string;
+  onMessageSent?: () => Promise<void> | void;
+};
+
+export default function MessageComposer({
+  conversationId,
+  onMessageSent,
+}: Props) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [error, setError] = useState("");
 
   async function onSend() {
     const text = content.trim();
     if (!text) return;
 
     setLoading(true);
-
-    let full = "";
+    setError("");
 
     try {
       await streamMessage(
         conversationId,
         text,
-        (chunk) => {
-          full += chunk;
-
-          // 👉 ici tu dois mettre à jour l'UI en live
-          console.log("chunk:", chunk);
-        },
-        () => {
-          console.log("done");
-          router.refresh(); // fallback (on améliore après)
+        () => undefined,
+        async () => {
+          await onMessageSent?.();
         }
       );
 
       setContent("");
     } catch (e) {
       console.error(e);
+      setError("Message non envoye. Verifie ta connexion puis reessaie.");
     } finally {
       setLoading(false);
     }
@@ -58,13 +60,17 @@ export default function MessageComposer({ conversationId }: { conversationId: st
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Bulle de typing pendant que l'IA répond */}
       {loading && <TypingIndicator />}
+      {error && (
+        <p className="px-3 text-sm font-semibold text-red-600 dark:text-red-300">
+          {error}
+        </p>
+      )}
 
-      <div className="relative flex items-center">
+      <div className="relative flex items-center rounded-[1.75rem] border border-feelingcare-light-border bg-white/80 p-2 transition-colors focus-within:border-feelingcare-primary dark:border-feelingcare-dark-border dark:bg-feelingcare-dark-bg-secondary/80 dark:focus-within:border-feelingcare-primary-dark">
         <input
-          className="w-full rounded-2xl bg-white/5 border border-white/10 px-5 py-4 pr-14 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-colors disabled:opacity-50"
-          placeholder="Tu peux répondre ici…"
+          className="min-h-12 w-full rounded-[1.4rem] bg-transparent px-4 py-3 pr-14 text-sm text-feelingcare-light-text placeholder:text-feelingcare-light-text-secondary focus:outline-none disabled:opacity-50 dark:text-feelingcare-dark-text dark:placeholder:text-feelingcare-dark-text-secondary"
+          placeholder="Ecris ce qui vient..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           disabled={loading}
@@ -75,20 +81,18 @@ export default function MessageComposer({ conversationId }: { conversationId: st
             }
           }}
         />
+
         <button
-          className="absolute right-3 p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          className="absolute right-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-feelingcare-primary text-feelingcare-light-text transition-all hover:bg-feelingcare-primary/90 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-feelingcare-primary-dark dark:text-feelingcare-dark-bg"
           onClick={onSend}
           disabled={loading || !content.trim()}
+          type="button"
+          aria-label="Envoyer"
         >
           {loading ? (
-            <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
+            <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+            <SendHorizontal className="h-5 w-5" />
           )}
         </button>
       </div>

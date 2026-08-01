@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { deleteConversation } from "@/lib/api";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
+
+import { deleteConversation } from "@/lib/api/conversation.api";
 
 export default function DeleteConversationButton({
   conversationId,
@@ -16,42 +17,44 @@ export default function DeleteConversationButton({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function onDelete(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (loading) return; 
+    if (loading) return;
 
     try {
       setLoading(true);
-
+      setError("");
       await deleteConversation(conversationId);
-
-      onDeleteSuccess?.(); 
+      onDeleteSuccess?.();
 
       if (isActive) {
         router.push("/");
       }
     } catch (err) {
       console.error(err);
-      alert("Impossible de supprimer la conversation.");
+      setError("Suppression impossible.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="w-full  gap-2 px-1 py-2 text-sm text-white/60 hover:text-red-400">
-    <button
-      onClick={onDelete}
-      disabled={loading}
-      className="flex items-start justify-start gap-2"
-      title="Supprimer la conversation"
-    >
-      <Trash2 size={16} />
-      <span >Supprimer</span>
-    </button>
-    </div>
+    <>
+      <button
+        onClick={onDelete}
+        disabled={loading}
+        className="flex w-full items-center rounded-xl px-3 py-2 text-left text-sm text-[#D95F4D] transition hover:bg-[#FFE7E2] disabled:cursor-not-allowed disabled:opacity-50"
+        title="Supprimer la conversation"
+        type="button"
+      >
+        <Trash2 className="mr-2 h-4 w-4" />
+        Supprimer
+      </button>
+      {error && <p className="px-3 pb-1 text-xs font-semibold text-red-500">{error}</p>}
+    </>
   );
 }

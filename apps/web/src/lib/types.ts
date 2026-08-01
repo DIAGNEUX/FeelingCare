@@ -18,6 +18,7 @@ export type Conversation = {
   title: string;
   emotion: Emotion | null;
   createdAt: string;
+  listenMode: boolean;
   messages: Message[];
 };
 
@@ -28,5 +29,5 @@ export type ConversationListItem = {
   createdAt: string;
   lastMessageAt: string;
 };
-
+export type ListenMode = 'default' | 'listen_only';
 export type ConversationStartResponse = Conversation;

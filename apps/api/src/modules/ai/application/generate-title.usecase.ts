@@ -17,8 +17,7 @@ export class GenerateTitleUseCase {
     ]);
 
     return (
-      completion.choices[0].message.content?.trim() ??
-      'Nouvelle conversation'
+      completion.choices[0].message.content?.trim() ?? 'Nouvelle conversation'
     );
   }
 }

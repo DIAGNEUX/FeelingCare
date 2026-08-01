@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { editMessage } from "@/lib/api";
+import { Check, Pencil, X } from "lucide-react";
+
+import { editMessage } from "@/lib/api/message.api";
 
 export default function EditMessageButton({
   conversationId,
@@ -16,6 +18,7 @@ export default function EditMessageButton({
   const [editing, setEditing] = useState(false);
   const [content, setContent] = useState(initialContent);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   async function onSave() {
@@ -27,12 +30,13 @@ export default function EditMessageButton({
 
     try {
       setLoading(true);
+      setError("");
       await editMessage(conversationId, messageId, text);
       setEditing(false);
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert("Impossible de modifier le message.");
+      setError("Modification impossible.");
     } finally {
       setLoading(false);
     }
@@ -40,14 +44,15 @@ export default function EditMessageButton({
 
   function onCancel() {
     setContent(initialContent);
+    setError("");
     setEditing(false);
   }
 
   if (editing) {
     return (
-      <div className="flex flex-col gap-2 max-w-[70%]">
+      <div className="flex max-w-[82%] flex-col gap-2 sm:max-w-[72%]">
         <textarea
-          className="rounded-2xl bg-blue-500/20 border border-blue-400/40 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-blue-400/60 resize-none"
+          className="resize-none rounded-[1.5rem] border border-feelingcare-primary bg-feelingcare-primary/15 px-4 py-3 text-sm leading-6 text-feelingcare-light-text placeholder:text-feelingcare-light-text-secondary focus:outline-none focus:ring-4 focus:ring-feelingcare-primary/20 disabled:opacity-50 dark:border-feelingcare-primary-dark dark:bg-feelingcare-primary-dark/10 dark:text-feelingcare-dark-text dark:placeholder:text-feelingcare-dark-text-secondary"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={3}
@@ -61,40 +66,48 @@ export default function EditMessageButton({
             if (e.key === "Escape") onCancel();
           }}
         />
-        <div className="flex gap-2 justify-end">
+        <div className="flex justify-end gap-2">
           <button
             onClick={onCancel}
-            className="text-xs text-white/40 hover:text-white/70 transition-colors"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-feelingcare-light-border bg-white text-feelingcare-light-text-secondary transition hover:bg-feelingcare-light-bg hover:text-feelingcare-light-text dark:border-feelingcare-dark-border dark:bg-feelingcare-dark-bg-secondary dark:text-feelingcare-dark-text-secondary"
             disabled={loading}
+            type="button"
+            aria-label="Annuler"
           >
-            Annuler
+            <X className="h-4 w-4" />
           </button>
           <button
             onClick={onSave}
-            className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition-colors disabled:opacity-50"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-feelingcare-primary text-feelingcare-light-text transition hover:bg-feelingcare-primary/90 disabled:opacity-50 dark:bg-feelingcare-primary-dark dark:text-feelingcare-dark-bg"
             disabled={loading}
+            type="button"
+            aria-label="Sauvegarder"
           >
-            {loading ? "Envoi..." : "Sauvegarder"}
+            <Check className="h-4 w-4" />
           </button>
         </div>
+        {error && (
+          <p className="px-1 text-right text-xs font-semibold text-red-500">
+            {error}
+          </p>
+        )}
       </div>
     );
   }
 
-    return (
-    <div className="group/msg flex flex-col items-end gap-1 max-w-[70%]">
-        <div className="w-fit rounded-2xl px-4 py-3 text-sm bg-white/10 text-white">
+  return (
+    <div className="group/msg flex max-w-[82%] flex-col items-end gap-1 sm:max-w-[72%]">
+      <div className="w-fit rounded-[1.5rem] rounded-br-md bg-feelingcare-primary px-4 py-3 text-sm leading-6 text-feelingcare-light-text">
         <div className="whitespace-pre-wrap break-words">{initialContent}</div>
-        </div>
-        <button
+      </div>
+      <button
         onClick={() => setEditing(true)}
-        className="opacity-0 group-hover/msg:opacity-100 transition-opacity text-xs text-white/30 hover:text-white/60 flex items-center gap-1"
-        >
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
+        className="flex items-center gap-1 px-2 text-xs text-feelingcare-light-text-secondary opacity-0 transition-opacity hover:text-feelingcare-light-text group-hover/msg:opacity-100 dark:text-feelingcare-dark-text-secondary dark:hover:text-feelingcare-dark-text"
+        type="button"
+      >
+        <Pencil className="h-3 w-3" />
         Modifier
-        </button>
+      </button>
     </div>
-    );
+  );
 }

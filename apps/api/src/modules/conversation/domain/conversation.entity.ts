@@ -23,7 +23,7 @@ export class Conversation {
     }
 
     if (e === 'fatigué' || e === 'fatigue') {
-      return "Je comprends. Cette fatigue, tu la ressens plutôt dans le corps, dans la tête, ou les deux ?";
+      return 'Je comprends. Cette fatigue, tu la ressens plutôt dans le corps, dans la tête, ou les deux ?';
     }
 
     if (e === 'en colère' || e === 'colère' || e === 'colere') {

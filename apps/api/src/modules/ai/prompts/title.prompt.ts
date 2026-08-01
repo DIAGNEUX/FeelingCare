@@ -1,22 +1,28 @@
 export function buildTitlePrompt(messages: any[]): string {
-  return `Tu es un assistant qui génère des titres courts pour des conversations émotionnelles.
+  return `Tu generes des titres courts pour des conversations emotionnelles.
 
-Règles :
-- Maximum 5 mots
-- Pas de guillemets
-- Pas de ponctuation à la fin
-- En français
-- Reflète le sujet principal de la conversation
+Regles :
+- maximum 5 mots
+- pas de guillemets
+- pas de ponctuation finale
+- en francais
+- titre concret, simple et respectueux
+- pas de diagnostic
 
 Exemples :
 - Fatigue au travail
-- Relation difficile avec mon père
+- Relation difficile
 - Stress avant les examens
 
 Conversation :
 ${messages
-  .map((m) => `${m.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${m.content}`)
+  .map(
+    (message) =>
+      `${message.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${
+        message.content
+      }`,
+  )
   .join('\n')}
 
-Génère un titre court.`;
+Genere uniquement le titre.`;
 }

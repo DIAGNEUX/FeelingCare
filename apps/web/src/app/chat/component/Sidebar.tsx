@@ -3,125 +3,162 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Home, LogOut, MoreHorizontal, Pencil, HeartPulse } from "lucide-react";
 
-import { listConversations } from "@/lib/api";
+import { logout } from "@/lib/api/auth.api";
+import { listConversations } from "@/lib/api/conversation.api";
+import { ThemeToggle } from "@/app/component/ui/theme-toggle";
+
 import NewConversationButton from "./Buttons/NewConversationButton";
 import DeleteConversationButton from "./Buttons/DeleteConversationButton";
 import RenameConversationButton from "./Buttons/RenameConversationButton";
+import type { ConversationListItem } from "@/lib/types";
 
-import type { Emotion } from "@/lib/types";
-import { Pencil } from "lucide-react";
-
-function formatEmotion(emotion: Emotion | null) {
-  return emotion ? emotion.name : "—";
-}
-
-export default function Sidebar({ activeId }: { activeId: string }) {
+export default function Sidebar({
+  activeId,
+  refreshKey = 0,
+  draftConversation,
+  draftHref = "/chat/new",
+}: {
+  activeId: string;
+  refreshKey?: number;
+  draftConversation?: ConversationListItem;
+  draftHref?: string;
+}) {
   const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<any[]>([]);
-  
+  const [conversations, setConversations] = useState<ConversationListItem[]>([]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      localStorage.removeItem("accessToken");
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      localStorage.removeItem("accessToken");
+      router.push("/login");
+    }
+  };
 
   useEffect(() => {
-  listConversations().then(setConversations);
-}, []);
+    listConversations().then(setConversations).catch(console.error);
+  }, [refreshKey]);
+
+  const displayedConversations = draftConversation
+    ? [
+        draftConversation,
+        ...conversations.filter((c) => c.id !== draftConversation.id),
+      ]
+    : conversations;
 
   return (
-    <aside className="w-70 shrink-0 h-screen flex flex-col bg-white/[0.02] backdrop-blur-xl border-r border-white/10">
-      
-      {/* HEADER */}
-      <div className="p-4 space-y-3">
-        <div>
-          <div className="text-sm font-semibold text-white/90">
-            FeelingCare
-          </div>
-          <p className="text-xs text-white/60">
-            Espace d'écoute bienveillant
-          </p>
+    <aside className="hidden h-screen w-[18rem] shrink-0 flex-col border-r border-feelingcare-light-border bg-feelingcare-light-bg px-4 py-5 dark:border-feelingcare-dark-border dark:bg-feelingcare-dark-bg md:flex">
+      <div className="space-y-4 border-b border-feelingcare-light-border pb-4 dark:border-feelingcare-dark-border">
+        <div className="flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[1.2rem] bg-feelingcare-primary text-feelingcare-light-text">
+              <HeartPulse className="h-6 w-6" />
+            </span>
+            <div>
+              <div className="text-sm font-bold text-feelingcare-light-text dark:text-feelingcare-dark-text">
+                FeelingCare
+              </div>
+              <p className="text-xs text-feelingcare-light-text-secondary dark:text-feelingcare-dark-text-secondary">
+                Espace d&apos;ecoute
+              </p>
+            </div>
+          </Link>
+          <ThemeToggle />
         </div>
 
-        <div className="space-y-2 text-amber-50">
+        <div className="space-y-2">
           <Link
             href="/"
-            className="block rounded-md px-3 py-2 text-sm hover:bg-white/5"
+            className="flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold text-feelingcare-light-text transition hover:bg-feelingcare-primary/10 dark:text-feelingcare-dark-text dark:hover:bg-feelingcare-primary-dark/10"
           >
-            Choisir une émotion
+            <Home className="h-4 w-4" />
+            Choisir une humeur
           </Link>
 
           <NewConversationButton />
         </div>
 
-        <div className="text-xs text-white/50">Historique</div>
+        <div className="px-1 text-xs font-semibold text-feelingcare-light-text-secondary dark:text-feelingcare-dark-text-secondary">
+          Historique
+        </div>
       </div>
 
-      {/* LISTE */}
-      <nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-1">
-        {conversations.map((c) => {
+      <nav className="flex-1 space-y-2 overflow-y-auto py-4">
+        {displayedConversations.map((c) => {
           const active = c.id === activeId;
+          const isDraft = draftConversation?.id === c.id;
 
           return (
             <div
               key={c.id}
-              onClick={() => router.push(`/chat/${c.id}`)}
-              className={`group cursor-pointer relative flex items-center rounded-md  text-amber-50 ${
+              onClick={() => router.push(isDraft ? draftHref : `/chat/${c.id}`)}
+              className={`group relative flex cursor-pointer items-center rounded-2xl border text-feelingcare-light-text transition-all dark:text-feelingcare-dark-text ${
                 active
-                  ? "border-white/20 bg-white/5"
-                  : "border-white/10 hover:bg-white/5"
+                  ? "border-transparent bg-feelingcare-primary/15"
+                  : "border-transparent hover:bg-feelingcare-primary/5 dark:hover:bg-feelingcare-primary-dark/5"
               }`}
             >
-              {/* CONTENU */}
-              <div className="flex-1 min-w-0 flex flex-col gap-0.5 p-2">
-                <RenameConversationButton
-                  conversationId={c.id}
-                  currentTitle={c.title}
-                  forceEditing={editingId === c.id}
-                  onDone={() => setEditingId(null)}
-                  onRenameSuccess={(newTitle) => {
-                    setConversations((prev) =>
-                      prev.map((conv) =>
-                        conv.id === c.id ? { ...conv, title: newTitle } : conv
-                      )
-                    );
-                  }}
-                />
-
-                
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5 p-3">
+                {isDraft ? (
+                  <div className="truncate text-sm font-bold">{c.title}</div>
+                ) : (
+                  <RenameConversationButton
+                    conversationId={c.id}
+                    currentTitle={c.title}
+                    forceEditing={editingId === c.id}
+                    onDone={() => setEditingId(null)}
+                    onRenameSuccess={(newTitle) => {
+                      setConversations((prev) =>
+                        prev.map((conv) =>
+                          conv.id === c.id ? { ...conv, title: newTitle } : conv
+                        )
+                      );
+                    }}
+                  />
+                )}
               </div>
 
-              {/* MENU ⋯ */}
-              <div
-                className={`transition-opacity pr-2 shrink-0 ${
-                  openMenuId === c.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                }`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="relative">
-                  <button
-                    className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(openMenuId === c.id ? null : c.id);
-                    }}
-                  >
-                    ⋯
-                  </button>
+              {!isDraft && (
+                <div
+                  className={`shrink-0 pr-2 transition-opacity ${
+                    openMenuId === c.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="relative">
+                    <button
+                      className="rounded-xl p-1.5 text-feelingcare-light-text-secondary transition hover:bg-white hover:text-feelingcare-light-text dark:text-feelingcare-dark-text-secondary dark:hover:bg-feelingcare-dark-bg dark:hover:text-feelingcare-dark-text"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === c.id ? null : c.id);
+                      }}
+                      type="button"
+                      aria-label="Options"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
 
-                  {/* MENU SIMPLE */}
-                  {openMenuId === c.id && (
-                    <div className="absolute right-0 top-6 mt-1 w-32 rounded-md bg-[#15191D]  shadow-lg z-90">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingId(c.id);
-                          setOpenMenuId(null);
-                        }}
-                        className="w-full text-left flex items-center px-3 py-2 text-sm text-white/60 hover:text-white"
-                      >
-                       <Pencil className="w-4 h-4 mr-2" /> Renommer
-                      </button>
+                    {openMenuId === c.id && (
+                      <div className="absolute right-0 top-7 z-50 mt-1 w-36 rounded-2xl border border-feelingcare-light-border bg-white p-1 shadow-lg dark:border-feelingcare-dark-border dark:bg-feelingcare-dark-bg-secondary">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingId(c.id);
+                            setOpenMenuId(null);
+                          }}
+                          className="flex w-full items-center rounded-xl px-3 py-2 text-left text-sm text-feelingcare-light-text transition hover:bg-feelingcare-primary/10 dark:text-feelingcare-dark-text dark:hover:bg-feelingcare-primary-dark/10"
+                          type="button"
+                        >
+                          <Pencil className="mr-2 h-4 w-4" /> Renommer
+                        </button>
 
-                      <div className="px-2 py-1">
                         <DeleteConversationButton
                           conversationId={c.id}
                           isActive={active}
@@ -132,23 +169,25 @@ export default function Sidebar({ activeId }: { activeId: string }) {
                           }}
                         />
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           );
         })}
       </nav>
-      <div className="p-4 border-t border-white/10">
-        <Link
-          href="/login"
-          className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-white/80 hover:bg-white/5 transition"
-        >
-          Se connecter
-        </Link>
-      </div>
 
+      <div className="border-t border-feelingcare-light-border pt-4 dark:border-feelingcare-dark-border">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center justify-start gap-2 rounded-2xl px-3 py-2 text-sm font-semibold text-feelingcare-light-text-secondary transition hover:bg-feelingcare-primary/10 hover:text-feelingcare-light-text dark:text-feelingcare-dark-text-secondary dark:hover:bg-feelingcare-primary-dark/10 dark:hover:text-feelingcare-dark-text"
+          type="button"
+        >
+          <LogOut className="h-4 w-4" />
+          Deconnexion
+        </button>
+      </div>
     </aside>
   );
 }
