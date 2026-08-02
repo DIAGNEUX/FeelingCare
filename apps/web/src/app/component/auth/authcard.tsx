@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import Link from "next/link";
 
 type AuthCardProps = {
   title: string;
@@ -15,8 +16,13 @@ export default function AuthCard({
 }: AuthCardProps) {
   return (
     <div className="w-full max-w-md rounded-[2rem] border border-feelingcare-light-border bg-white p-8 shadow-[0_24px_70px_rgba(23,23,23,0.10)] dark:border-feelingcare-dark-border dark:bg-feelingcare-dark-bg-secondary dark:shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
-      <div className="mb-8 inline-flex rounded-full bg-feelingcare-primary px-4 py-2 text-xs font-bold uppercase text-feelingcare-light-text">
-        FeelingCare
+      <div className="mb-8">
+        <Link
+          href="/"
+          className="inline-flex rounded-full bg-feelingcare-primary px-4 py-2 text-xs font-bold uppercase text-feelingcare-light-text transition hover:bg-feelingcare-primary/90"
+        >
+          FeelingCare
+        </Link>
       </div>
 
       <h1 className="text-3xl font-bold text-feelingcare-light-text dark:text-feelingcare-dark-text">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowRight, HeartPulse } from "lucide-react";
+import { ArrowLeft, ArrowRight, HeartPulse } from "lucide-react";
 
 import AuthCard from "@/app/component/auth/authcard";
 import Input from "@/app/component/auth/input";
@@ -45,13 +45,25 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-feelingcare-light-bg px-4 py-8 text-feelingcare-light-text transition-colors duration-300 dark:bg-feelingcare-dark-bg dark:text-feelingcare-dark-text">
+    <main className="relative min-h-screen bg-feelingcare-light-bg px-4 pb-8 pt-20 text-feelingcare-light-text transition-colors duration-300 dark:bg-feelingcare-dark-bg dark:text-feelingcare-dark-text lg:py-8">
+      <Link
+        href="/"
+        className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 px-1 py-1 text-sm font-bold text-feelingcare-light-text-secondary transition hover:text-feelingcare-light-text dark:text-feelingcare-dark-text-secondary dark:hover:text-feelingcare-dark-text sm:left-6 lg:left-10"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Retour à l&apos;accueil
+      </Link>
+
       <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-8 lg:grid-cols-[1fr_440px]">
         <section className="hidden lg:block">
           <div className="max-w-xl">
-            <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-feelingcare-primary text-feelingcare-light-text shadow-[0_18px_45px_rgba(221,242,65,0.35)]">
+            <Link
+              href="/"
+              className="mb-8 flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-feelingcare-primary text-feelingcare-light-text shadow-[0_18px_45px_rgba(221,242,65,0.35)] transition hover:bg-feelingcare-primary/90"
+              aria-label="Retour a l'accueil"
+            >
               <HeartPulse className="h-8 w-8" />
-            </div>
+            </Link>
             <h1 className="text-5xl font-bold leading-tight">
               Reviens dans ton espace calme.
             </h1>
